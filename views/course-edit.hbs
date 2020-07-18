@@ -1,23 +1,25 @@
-<h1>Добавити курс</h1>
+<h1>Редагувати курс {{course.title}}</h1>
 
-<form action="/add" method="POST">
+<form action="/courses/edit" method="POST">
     <div class="input-field col s6">
-        <input name="title" id="title" type="text" class="validate" required>
+        <input name="title" id="title" type="text" class="validate" required value="{{course.title}}">
         <label for="title">Назва курсу</label>
         <span class="helper-text" data-error="Введіть назву курсу"></span>
     </div>
 
     <div class="input-field col s6">
-        <input name="price" id="price" type="number" class="validate" required min="1">
+        <input name="price" id="price" type="number" class="validate" required min="1" value="{{course.price}}">
         <label for="price">Ціна курсу</label>
         <span class="helper-text" data-error="Введіть ціну курсу"></span>
     </div>
 
     <div class="input-field col s6">
-        <input name="img" id="img" type="text" class="validate" required>
+        <input name="img" id="img" type="text" class="validate" required value="{{course.img}}">
         <label for="img">URL картинки</label>
         <span class="helper-text" data-error="Введіть URL картинки"></span>
     </div>
 
-    <button class="btn btn-primary">Добавити курс</button>
+    <input type="hidden" name="id" value="{{course.id}}">
+
+    <button class="btn btn-primary">Редагувати курс</button>
 </form>
