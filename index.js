@@ -11,13 +11,14 @@ const hbs = exphbs.create({
 
 app.engine('hbs', hbs.engine)
 app.set('view engine', 'hbs')
+app.set('views', 'views')
 
 app.get('/', (request, response, next) => {
-    response.sendFile(path.join(__dirname, 'views', 'index.html'))
+    response.render('index')
 })
 
 app.get('/about', (request, response, next) => {
-    response.sendFile(path.join(__dirname, 'views', 'about.html'))
+    response.render('about')
 })
 
 
