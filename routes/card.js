@@ -10,14 +10,35 @@ router.post('/add', async (req, res) => {
     res.redirect('/card')
 })
 
+function mapCartItems(cart){
+    return cart.items.map(c => ({
+        ...c.courseId._doc, count: c.count
+    }));
+}
+
+function computePrice(courses) {
+    return courses.reduce((total, course) => {
+        return total += course.price * course.count;
+    }, 0)
+}
+
 router.get('/', async (req, res) => {
     // const card = await Card.fetch();
-    // res.render('card', {
-    //     title: 'Корзина',
-    //     isCard: true,
-    //     ...card
-    // })
-    res.json({text:true});
+    const user = await req.user.populate('cart.items.courseId').execPopulate();
+
+    const courses = mapCartItems(user.cart)
+    // console.log(courses);
+    
+    // console.log(user.cart.items);
+
+    res.render('card', {
+        title: 'Корзина',
+        isCard: true,
+        courses,
+        price: computePrice(courses)
+        // ...card
+    })
+    // res.json({text:true});
 })
 
 router.delete('/remove/:id', async(req, res) => {
