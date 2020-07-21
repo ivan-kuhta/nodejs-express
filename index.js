@@ -9,6 +9,7 @@ const homeRoutes = require('./routes/home');
 const coursesRoutes = require('./routes/courses');
 const addRoutes = require('./routes/add');
 const cardRoutes = require('./routes/card');
+const User = require('./models/user');
 
 const app = express();
 
@@ -21,6 +22,17 @@ const hbs = exphbs.create({
 app.engine('hbs', hbs.engine)
 app.set('view engine', 'hbs')
 app.set('views', 'views')
+
+app.use(async (req, res, next) => {
+    try{
+        const user = await User.findById('5f16d58b01b1299f9fab27ac')
+        req.user = user
+        next();
+    } catch (e) {
+        console.log(e);
+    }
+})
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({extended: true}))
@@ -38,6 +50,17 @@ async function start() {
         const password = '9ywk61JB6Gr028xc';
         const url =`mongodb+srv://ivan_kuhta:${password}@cluster0.yuzio.mongodb.net/shop`;
         await mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false});
+        
+        const candidate = await User.findOne()
+        if(!candidate) {
+            const user = new User({
+                email: 'Ivan1998pi22342@ukr.net',
+                name: 'Ivan',
+                cart: {items: []}
+            })
+            await user.save();
+        }
+
         app.listen(PORT, () => {
             console.log(`Server is runnung http://127.0.0.1:${PORT}`);
         })
