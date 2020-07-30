@@ -1,16 +1,17 @@
 const {Router} = require('express');
 const Course = require('../models/course')
+const auth = require('../middleware/auth');
 
 const router = Router()
 
-router.get('/', (request, response, next) => {
+router.get('/', auth, (request, response, next) => {
     response.render('add', {
         title: 'Добавити курс',
         isAdd: true
     })
 })
 
-router.post('/', async (request, response) => {
+router.post('/', auth, async (request, response) => {
     // console.log(request.body);
     // const course = new Course(request.body.title, request.body.price, request.body.img);
     const course = new Course({

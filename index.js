@@ -5,6 +5,10 @@ const Handlebars = require('handlebars');
 const mongoose = require('mongoose');
 const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access');
 const session = require('express-session');
+const MongoStore = require('connect-mongodb-session')(session);
+const csrf = require('csurf');
+const flash = require('connect-flash');
+
 
 const homeRoutes = require('./routes/home');
 const coursesRoutes = require('./routes/courses');
@@ -15,8 +19,10 @@ const authRoutes = require('./routes/auth');
 
 const varMiddleware = require('./middleware/variables');
 
-const User = require('./models/user');
+// const User = require('./models/user');
+const userMiddleware = require('./middleware/user');
 
+const MONGODB_URI =`mongodb+srv://ivan_kuhta:9ywk61JB6Gr028xc@cluster0.yuzio.mongodb.net/shop`;
 
 const app = express();
 
@@ -26,29 +32,27 @@ const hbs = exphbs.create({
     handlebars: allowInsecurePrototypeAccess(Handlebars)
 })
 
+const store = new MongoStore({
+    collection: 'sessions',
+    uri: MONGODB_URI
+})
+
 app.engine('hbs', hbs.engine)
 app.set('view engine', 'hbs')
 app.set('views', 'views')
-
-// app.use(async (req, res, next) => {
-//     try{
-//         const user = await User.findById('5f16d58b01b1299f9fab27ac')
-//         req.user = user
-//         next();
-//     } catch (e) {
-//         console.log(e);
-//     }
-// })
-
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({extended: true}))
 app.use(session({
     secret: 'some secret value',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    store
 }));
+app.use(csrf());
+app.use(flash());
 app.use(varMiddleware);
+app.use(userMiddleware);
 
 app.use('/', homeRoutes)
 app.use('/courses', coursesRoutes)
@@ -62,19 +66,7 @@ const PORT = process.env.PORT || 3000;
 
 async function start() {
     try {
-        const password = '9ywk61JB6Gr028xc';
-        const url =`mongodb+srv://ivan_kuhta:${password}@cluster0.yuzio.mongodb.net/shop`;
-        await mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false});
-        
-        // const candidate = await User.findOne()
-        // if(!candidate) {
-        //     const user = new User({
-        //         email: 'Ivan1998pi22342@ukr.net',
-        //         name: 'Ivan',
-        //         cart: {items: []}
-        //     })
-        //     await user.save();
-        // }
+        await mongoose.connect(MONGODB_URI, {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false});
 
         app.listen(PORT, () => {
             console.log(`Server is runnung http://127.0.0.1:${PORT}`);

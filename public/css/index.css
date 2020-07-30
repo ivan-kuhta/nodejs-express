@@ -39,3 +39,13 @@
 .auth{
     padding-top: 2rem;
 }
+
+.alert{
+    padding: .5rem;
+    text-align: center;
+    margin: 1rem auto;
+    background-color: rgba(255, 0, 0, 0.4);
+    border: 1px solid red;
+    color: rgb(104, 17, 17);
+    border-radius: .5rem;
+}
